@@ -57,6 +57,14 @@ namespace Quinmars.AsyncObservable2
 
             return new Finally<T>(source, action);
         }
+        
+        public static IAsyncObservable<T> LazyConcat<T>(this IAsyncObservable<IAsyncObservable<T>> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            return new LazyConcat<T>(source);
+        }
 
         public static IAsyncObservable<T> Never<T>()
         {
