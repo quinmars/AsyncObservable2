@@ -19,13 +19,33 @@ namespace Quinmars.AsyncObservable2
 
         public async ValueTask SubscribeAsync(IAsyncObserver<T> observer, CancellationToken token)
         {
-            try
+            var obs = new Observer(observer, _action);
+            await _source.SubscribeAsync(obs, token).ConfigureAwait(false);
+        }
+
+        private class Observer : IAsyncObserver<T>
+        { 
+            readonly IAsyncObserver<T> _observer;
+            readonly Action _action;
+
+            public Observer(IAsyncObserver<T> observer, Action action)
             {
-                await _source.SubscribeAsync(observer, token).ConfigureAwait(true);
+                _observer = observer;
+                _action = action;
             }
-            finally
+
+            public ValueTask<bool> OnNextAsync(T value) => _observer.OnNextAsync(value);
+            
+            public async ValueTask DisposeAsync()
             {
-                _action();
+                try
+                {
+                    _action();
+                }
+                finally
+                {
+                    await _observer.DisposeAsync().ConfigureAwait(false);
+                }
             }
         }
     }
