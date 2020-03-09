@@ -158,6 +158,16 @@ namespace Quinmars.AsyncObservable2
             return new Select<TSource, TResult>.AsyncWithCancellation(source, selector);
         }
 
+        public static IAsyncObservable<T> Skip<T>(this IAsyncObservable<T> source, int count)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            return new Skip<T>(source, count);
+        }
+
         public static IAsyncObservable<T> Take<T>(this IAsyncObservable<T> source, int count)
         {
             if (source == null)
